@@ -2,6 +2,7 @@ package inmemorydb
 
 import (
 	"feedwell/people"
+	"strconv"
 )
 
 //PeopleRepository is a repository  for get/set people
@@ -16,6 +17,8 @@ func (imr PeopleRepository) GetAllPeople() []people.User {
 
 //AddPerson adds a new person to the source repository
 func (imr *PeopleRepository) AddPerson(p people.Person) {
+	//TODO: Change this mechanism
+	p.ID = strconv.Itoa(len(imr.users) + 1)
 	imr.users = append(imr.users, *people.NewNonRegisteredUser(p))
 }
 
