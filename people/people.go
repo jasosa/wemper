@@ -6,6 +6,3 @@ type Person struct {
 	Name  string `json:"name,omitempty"`
 	Email string `json:"email,omitempty"`
 }
-
-//People represents a collection of sinlge persons
-var People []Person
