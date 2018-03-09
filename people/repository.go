@@ -2,6 +2,6 @@ package people
 
 //Repository for people
 type Repository interface {
-	GetAllPeople() []Person
+	GetAllPeople() []User
 	AddPerson(p Person)
 }

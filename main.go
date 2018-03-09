@@ -38,6 +38,7 @@ func init() {
 func main() {
 	router := mux.NewRouter()
 	router.HandleFunc("/people", GetPeople).Methods("GET")
+	//TODO: ID can be handled internally. We should remove it from the endpoint
 	router.HandleFunc("/people/{id}", InvitePerson).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
