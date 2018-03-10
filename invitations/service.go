@@ -1,38 +1,33 @@
-package people
-
-import (
-	"feedwell/invitations"
-)
+package invitations
 
 //Service exposes all the methods related to handled people
 type Service interface {
-	GetAllUsers() []User
-	InvitePerson(inviterID string, invitee Person) (invitations.Invitation, error)
+	GetAllUsers(GetFromSource func() []User) []User
+	InvitePerson(inviterID string, invitee Person) (Invitation, error)
 	//AcceptInvitation(invited Person)
 }
 
 //basicService implements Service
 type basicService struct {
 	repository Repository
-	sender     invitations.Sender
+	sender     Sender
 }
 
 //NewBasicService creates a new instance of people.Service
-func NewBasicService(repository Repository, sender invitations.Sender) Service {
+func NewBasicService(repository Repository, sender Sender) Service {
 	service := new(basicService)
 	service.repository = repository
 	service.sender = sender
 	return *service
 }
 
-//GetAllUsers ....
-func (serv basicService) GetAllUsers() []User {
-	return serv.repository.GetAllPeople()
+func (serv basicService) GetAllUsers(GetFromAnySource func() []User) []User {
+	return GetFromAnySource()
 }
 
 //InvitePerson ... returns the generated invitation text
-func (serv basicService) InvitePerson(inviterID string, invitee Person) (invitations.Invitation, error) {
-	var invitation invitations.Invitation
+func (serv basicService) InvitePerson(inviterID string, invitee Person) (Invitation, error) {
+	var invitation Invitation
 	var err error
 	var inviter *User
 
@@ -40,9 +35,10 @@ func (serv basicService) InvitePerson(inviterID string, invitee Person) (invitat
 	inviter, err = serv.repository.GetPersonByID(inviterID)
 	if err == nil {
 		//add person to the source
-		serv.repository.AddPerson(&invitee)
 		invitation, err = inviter.generateInvitation(invitee)
 		if err == nil {
+			//new person is added
+			serv.repository.AddPerson(&invitee)
 			//then send email to the person
 			sendInvitation(invitation, serv.sender)
 		}
@@ -50,6 +46,6 @@ func (serv basicService) InvitePerson(inviterID string, invitee Person) (invitat
 	return invitation, err
 }
 
-func sendInvitation(invitation invitations.Invitation, sender invitations.Sender) {
+func sendInvitation(invitation Invitation, sender Sender) {
 	sender.Send(invitation)
 }

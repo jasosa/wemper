@@ -1,8 +1,7 @@
-package people
+package invitations
 
 import (
 	"errors"
-	"feedwell/invitations"
 	"fmt"
 )
 
@@ -33,11 +32,11 @@ type Inviter interface {
 	generateInvitation(p Person) (string, error)
 }
 
-func (u User) generateInvitation(p Person) (invitations.Invitation, error) {
-	var invitation invitations.Invitation
+func (u User) generateInvitation(p Person) (Invitation, error) {
+	var invitation Invitation
 	var err error
 	if u.Registered {
-		invitation = *invitations.NewInvitation(u.PersonBase.ID, p.ID, fmt.Sprintf("This is an invitation from %s to %s", u.PersonBase.Name, p.Email))
+		invitation = *NewInvitation(u.PersonBase.ID, p.ID, fmt.Sprintf("This is an invitation from %s to %s", u.PersonBase.Name, p.Email))
 	} else {
 		err = errors.New("A non-registered user cannot send invitations")
 	}

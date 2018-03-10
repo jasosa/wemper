@@ -1,4 +1,4 @@
-package people
+package invitations
 
 import (
 	"testing"

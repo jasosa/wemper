@@ -1,4 +1,4 @@
-package people
+package invitations
 
 //Repository for people
 type Repository interface {
