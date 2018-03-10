@@ -2,6 +2,7 @@ package people
 
 import (
 	"errors"
+	"feedwell/invitations"
 	"fmt"
 )
 
@@ -20,26 +21,25 @@ type User struct {
 }
 
 //NewNonRegisteredUser sdfasdf
-func NewNonRegisteredUser(p Person) *User {
+func NewNonRegisteredUser(p Person) User {
 	user := new(User)
 	user.PersonBase = p
 	user.Registered = false
-	return user
+	return *user
 }
 
 // Inviter represents the ability to invite someone to join a certain community
 type Inviter interface {
-	invite(email string) (string, error)
+	generateInvitation(p Person) (string, error)
 }
 
-func (u User) invite(email string) (string, error) {
-	var invitation string
+func (u User) generateInvitation(p Person) (invitations.Invitation, error) {
+	var invitation invitations.Invitation
 	var err error
 	if u.Registered {
-		invitation = fmt.Sprintf("This is an invitation from %s to %s", u.PersonBase.Name, email)
+		invitation = *invitations.NewInvitation(u.PersonBase.ID, p.ID, fmt.Sprintf("This is an invitation from %s to %s", u.PersonBase.Name, p.Email))
 	} else {
 		err = errors.New("A non-registered user cannot send invitations")
 	}
-
 	return invitation, err
 }

@@ -5,7 +5,7 @@ import (
 )
 
 func TestWhenNewNonRegisteredUserIsCreatedThenShouldNotBeRegistered(t *testing.T) {
-	user := NewNonRegisteredUser(*giveMeAPerson())
+	user := NewNonRegisteredUser(giveMeAPerson())
 	if user.Registered {
 		t.Errorf("User should not be registered")
 	}
@@ -13,25 +13,30 @@ func TestWhenNewNonRegisteredUserIsCreatedThenShouldNotBeRegistered(t *testing.T
 func TestRegisteredUserGeneratesInvitationCorrectly(t *testing.T) {
 
 	u := User{
-		PersonBase: *giveMeAPerson(),
+		PersonBase: giveMeAPerson(),
 		Registered: true,
 	}
 
-	invitation, _ := u.invite("myadress@email.com")
-	if expected := "This is an invitation from Peter to myadress@email.com"; expected != invitation {
-		t.Errorf("Invitation sent was not the expected one: %s", invitation)
+	invitation, _ := u.generateInvitation(giveMeAnotherPerson())
+	if invitation.Text != "This is an invitation from Peter to John@cool.com" {
+		t.Errorf("Invitation was not generated successfully")
 	}
 }
 
 func TestNonRegisteredUserCannotInvite(t *testing.T) {
-	u := NewNonRegisteredUser(*giveMeAPerson())
-	_, err := u.invite("invited@user.com")
+	u := NewNonRegisteredUser(giveMeAPerson())
+	_, err := u.generateInvitation(giveMeAnotherPerson())
 	if err == nil {
 		t.Errorf("Not registered users should not be able to invite anyone")
 	}
 }
 
-func giveMeAPerson() *Person {
+func giveMeAPerson() Person {
 	person := Person{ID: "1", Name: "Peter", Email: "Peter@cool.com"}
-	return &person
+	return person
+}
+
+func giveMeAnotherPerson() Person {
+	person := Person{ID: "2", Name: "John", Email: "John@cool.com"}
+	return person
 }
