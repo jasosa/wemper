@@ -2,7 +2,7 @@ package invitations
 
 //Service exposes all the methods related to handled people
 type Service interface {
-	GetAllUsers(GetFromSource func() []User) []User
+	GetAllUsers(GetFromSource func() ([]User, error)) ([]User, error)
 	InvitePerson(inviterID string, invitee Person) (Invitation, error)
 	//AcceptInvitation(invited Person)
 }
@@ -21,7 +21,7 @@ func NewBasicService(repository Repository, sender Sender) Service {
 	return *service
 }
 
-func (serv basicService) GetAllUsers(GetFromAnySource func() []User) []User {
+func (serv basicService) GetAllUsers(GetFromAnySource func() ([]User, error)) ([]User, error) {
 	return GetFromAnySource()
 }
 

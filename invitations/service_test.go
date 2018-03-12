@@ -7,7 +7,7 @@ import (
 func TestWhenGetAllUsersThenRepositoryGetsTheUsers(t *testing.T) {
 	testRepo := new(RepoForTest)
 	s := NewBasicService(testRepo, nil)
-	users := s.GetAllUsers(testRepo.GetAllPeople)
+	users, _ := s.GetAllUsers(testRepo.GetAllPeople)
 	if len(users) != 2 {
 		t.Errorf("Retrieving users from source was not successful. %d were returned instead of %d", len(users), 2)
 	}

@@ -12,8 +12,8 @@ type PeopleRepository struct {
 }
 
 //GetAllPeople from a repository in memory
-func (imr PeopleRepository) GetAllPeople() []invitations.User {
-	return imr.users
+func (imr PeopleRepository) GetAllPeople() ([]invitations.User, error) {
+	return imr.users, nil
 }
 
 //GetPersonByID ...
@@ -27,10 +27,11 @@ func (imr PeopleRepository) GetPersonByID(id string) (*invitations.User, error) 
 }
 
 //AddPerson adds a new person to the source repository
-func (imr *PeopleRepository) AddPerson(p *invitations.Person) {
+func (imr *PeopleRepository) AddPerson(p *invitations.Person) error {
 	//TODO: Change this mechanism
 	p.ID = strconv.Itoa(len(imr.users) + 1)
 	imr.users = append(imr.users, invitations.NewNonRegisteredUser(*p))
+	return nil
 }
 
 //NewPeopleRepository initializes a in memory repository

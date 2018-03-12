@@ -3,8 +3,9 @@ package main
 import (
 	"encoding/json"
 	"feedwell/fake"
-	"feedwell/inmemorydb"
+	_ "feedwell/inmemorydb"
 	"feedwell/invitations"
+	"feedwell/mysql"
 	"log"
 	"net/http"
 
@@ -15,7 +16,8 @@ import (
 func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	// TODO: Check errors in encoding
 	//json.NewEncoder(w).Encode(service.GetAllUsers())
-	json.NewEncoder(w).Encode(service.GetAllUsers(repository.GetAllPeople))
+	users, _ := service.GetAllUsers(repository.GetAllPeople)
+	json.NewEncoder(w).Encode(users)
 }
 
 // InvitePerson sends an invitation to the person to the default community. This person have the status "invited"
@@ -26,7 +28,7 @@ func InvitePerson(w http.ResponseWriter, r *http.Request) {
 	_ = json.NewDecoder(r.Body).Decode(&person)
 	inv, err := service.InvitePerson(id, person)
 	if err != nil {
-		json.NewEncoder(w).Encode(err)
+		json.NewEncoder(w).Encode(err) //TODO: Change this to handle http Errors
 	} else {
 		json.NewEncoder(w).Encode(inv)
 	}
@@ -37,7 +39,8 @@ var repository invitations.Repository
 
 func init() {
 	// assigning all the repository interfaces
-	repository = inmemorydb.NewPeopleRepository()
+	//repository = inmemorydb.NewPeopleRepository()
+	repository = mysql.NewPeopleRepository(new(mysql.DbConnection))
 	var sender = fake.NewInvitationSender()
 	service = invitations.NewBasicService(repository, sender)
 }

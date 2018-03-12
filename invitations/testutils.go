@@ -8,7 +8,7 @@ import (
 type RepoForTest struct{}
 
 //GetAllPeople ...
-func (r RepoForTest) GetAllPeople() []User {
+func (r RepoForTest) GetAllPeople() ([]User, error) {
 	return []User{
 		User{
 			PersonBase: Person{Email: "myemail", Name: "nyname", ID: "1"},
@@ -18,7 +18,7 @@ func (r RepoForTest) GetAllPeople() []User {
 			PersonBase: Person{Email: "myemail2", Name: "nyname2", ID: "2"},
 			Registered: true,
 		},
-	}
+	}, nil
 }
 
 //GetPersonByID ...
@@ -39,8 +39,8 @@ func (r RepoForTest) GetPersonByID(id string) (*User, error) {
 }
 
 //AddPerson ...
-func (r RepoForTest) AddPerson(p *Person) {
-	//don´t do nothing
+func (r RepoForTest) AddPerson(p *Person) error {
+	return nil
 }
 
 //InvitationSenderForTest ...

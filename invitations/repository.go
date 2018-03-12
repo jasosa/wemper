@@ -2,7 +2,7 @@ package invitations
 
 //Repository for people
 type Repository interface {
-	GetAllPeople() []User
+	GetAllPeople() ([]User, error)
 	GetPersonByID(id string) (*User, error)
-	AddPerson(p *Person)
+	AddPerson(p *Person) error
 }
