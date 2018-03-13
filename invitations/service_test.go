@@ -16,7 +16,8 @@ func TestWhenGetAllUsersThenRepositoryGetsTheUsers(t *testing.T) {
 func TestWhenInvitationSentByNonExistentInviterShouldReturnError(t *testing.T) {
 	testRepo := new(RepoForTest)
 	s := NewBasicService(testRepo, nil)
-	_, err := s.InvitePerson("nonExistentPersonID", Person{Email: "myemail", Name: "nyname", ID: "10"})
+
+	_, err := s.InvitePerson("nonExistentPersonID", NewUser{Name: "myname", Email: "myemail"})
 	if err == nil {
 		t.Error("An error should be returned when an invitation arrives from a non-existend ID")
 	}
@@ -25,8 +26,8 @@ func TestWhenInvitationSentByNonExistentInviterShouldReturnError(t *testing.T) {
 func TestWhenInvitationCannotbeSentShouldReturnError(t *testing.T) {
 	testRepo := new(RepoForTest)
 	s := NewBasicService(testRepo, nil)
-	_, err := s.InvitePerson("NonRegisteredPersonID", Person{Email: "myemail@email.com", Name: "nyname", ID: "10"})
-	if err.Error() != "A non-registered user cannot send invitations" {
+	_, err := s.InvitePerson("NonRegisteredPersonID", NewUser{Name: "myname", Email: "myemail"})
+	if err.Error() != "The user has not enough permission to invite people" {
 		t.Error("An error should be returned when a non-registered user tries to generates an invitation")
 	}
 }
@@ -35,9 +36,9 @@ func TestWhenInvitationIsSentTheBodyOfTheInvitationIsReturned(t *testing.T) {
 	testRepo := new(RepoForTest)
 	sender := new(InvitationSenderForTest)
 	s := NewBasicService(testRepo, sender)
-	inv, _ := s.InvitePerson("ARegisteredPersonID", Person{Email: "myemail@email.com", Name: "nyname", ID: "10"})
-	if inv.Text != "This is an invitation from NameFromRegistered to myemail@email.com" {
-		t.Error("Invitation was not returned succesfully")
+	inv, _ := s.InvitePerson("ARegisteredPersonID", NewUser{Name: "myname", Email: "myemail"})
+	if inv.Text != "This is an invitation from adminPersonName to myemail" {
+		t.Errorf("Invitation was not returned succesfully: %s", inv.Text)
 	}
 	if !sender.SendCalled {
 		t.Error("Invitation sender was not called")

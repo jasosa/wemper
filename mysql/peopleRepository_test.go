@@ -40,6 +40,68 @@ func TestGetAllUsersShouldReturnAllUsersInDb(t *testing.T) {
 	}
 }
 
+func TestWhenUserIsAdminAnAdminUserIsReturned(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Error opening stub db connection: %s ", err.Error())
+	}
+
+	defer db.Close()
+	//Creating repo with mock database
+	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
+
+	//Setting expectations
+	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
+		AddRow(1, "pepito", "pepito@email.com", true, true)
+
+	mock.ExpectQuery("^SELECT (.+) from USERS$").WillReturnRows(rows)
+
+	//Acting
+	users, errQuery := peopleRepository.GetAllPeople()
+
+	// Asserting
+	if errQuery != nil {
+		t.Errorf("Error: %s", errQuery)
+	}
+
+	userapp := users[0]
+
+	if !userapp.CanInvite() || !userapp.CanGiveFeedback() {
+		t.Errorf("Admin users should be able to invite and to give feedback.")
+	}
+}
+
+func TestWhenUserIsRegisteredARegisteredUserIsReturned(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("Error opening stub db connection: %s ", err.Error())
+	}
+
+	defer db.Close()
+	//Creating repo with mock database
+	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
+
+	//Setting expectations
+	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
+		AddRow(1, "pepito", "pepito@email.com", true, false)
+
+	mock.ExpectQuery("^SELECT (.+) from USERS$").WillReturnRows(rows)
+
+	//Acting
+	users, errQuery := peopleRepository.GetAllPeople()
+
+	// Asserting
+	if errQuery != nil {
+		t.Errorf("Error: %s", errQuery)
+	}
+
+	userapp := users[0]
+
+	if userapp.CanInvite() || !userapp.CanGiveFeedback() {
+		t.Errorf("Registered users should be able to give feedback but not to invite.")
+	}
+}
+
 func TestWhenThereisAnErrorPreparingTheQueryAnErrorShouldBeReturned(t *testing.T) {
 	//Setup test and mock
 	db, mock, err := sqlmock.New()
@@ -77,19 +139,19 @@ func TestWhenRequstingByIdAPersonShouldBeReturned(t *testing.T) {
 	//Creating repo with mock database
 	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
 
-	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered"}).
-		AddRow(1, "pepito", "pepito@email.com", true)
+	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
+		AddRow(1, "pepito", "pepito@email.com", true, false)
 
 	mock.ExpectQuery("^SELECT (.+) FROM users WHERE (.+)$").WithArgs("1").WillReturnRows(rows)
 
 	//Acting
-	person, errRep := peopleRepository.GetPersonByID("1")
+	user, errRep := peopleRepository.GetPersonByID("1")
 
 	// Asserting
 	if errRep != nil {
 		t.Errorf("Error: %s", errRep)
-	} else if person.PersonBase.Name != "pepito" {
-		t.Errorf("Returned person name is not right: %s", person.PersonBase.Name)
+	} else if user.GetPersonInfo().Name != "pepito" {
+		t.Errorf("Returned person name is not right: %s", user.GetPersonInfo().Name)
 	}
 }
 
@@ -124,7 +186,7 @@ func TestWhenAPersonIsAddedThePersonIsRegisteredInTheDB(t *testing.T) {
 	defer db.Close()
 
 	//setting expectations
-	mock.ExpectExec("INSERT INTO users").WithArgs("Peter", "Peter@cool.com", false).WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("INSERT INTO users").WithArgs("Peter", "Peter@cool.com", false, false).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	//acting
 	errRep := peopleRepository.AddPerson(giveMeAPerson())
@@ -166,7 +228,7 @@ func (db *MockDbConnection) OpenConnection(stringConn string) (*sql.DB, error) {
 	return db.mockdb, db.mockdb.Ping()
 }
 
-func giveMeAPerson() *invitations.Person {
-	person := invitations.Person{Name: "Peter", Email: "Peter@cool.com"}
-	return &person
+func giveMeAPerson() invitations.AppUser {
+	person := invitations.NewInvitedUser("", "Peter", "Peter@cool.com")
+	return person
 }

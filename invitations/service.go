@@ -1,9 +1,14 @@
 package invitations
 
+import (
+	"errors"
+	"fmt"
+)
+
 //Service exposes all the methods related to handled people
 type Service interface {
-	GetAllUsers(GetFromSource func() ([]User, error)) ([]User, error)
-	InvitePerson(inviterID string, invitee Person) (Invitation, error)
+	GetAllUsers(GetFromSource func() ([]AppUser, error)) ([]AppUser, error)
+	InvitePerson(inviterID string, invited NewUser) (Invitation, error)
 	//AcceptInvitation(invited Person)
 }
 
@@ -21,29 +26,30 @@ func NewBasicService(repository Repository, sender Sender) Service {
 	return *service
 }
 
-func (serv basicService) GetAllUsers(GetFromAnySource func() ([]User, error)) ([]User, error) {
+func (serv basicService) GetAllUsers(GetFromAnySource func() ([]AppUser, error)) ([]AppUser, error) {
 	return GetFromAnySource()
 }
 
 //InvitePerson ... returns the generated invitation text
-func (serv basicService) InvitePerson(inviterID string, invitee Person) (Invitation, error) {
-	var invitation Invitation
-	var err error
-	var inviter *User
-
+func (serv basicService) InvitePerson(inviterID string, newUser NewUser) (Invitation, error) {
 	//get inviter
-	inviter, err = serv.repository.GetPersonByID(inviterID)
-	if err == nil {
-		//add person to the source
-		invitation, err = inviter.generateInvitation(invitee)
-		if err == nil {
-			//new person is added
-			serv.repository.AddPerson(&invitee)
-			//then send email to the person
-			sendInvitation(invitation, serv.sender)
-		}
+	inviterUser, err := serv.repository.GetPersonByID(inviterID)
+
+	if err != nil {
+		return Invitation{}, fmt.Errorf("Error getting information from datasource: %s", err.Error())
 	}
-	return invitation, err
+	inviter, ok := inviterUser.(Inviter)
+	if ok {
+		//creates a new invitedUser based on newUser info
+		invited := NewInvitedUser("", newUser.Name, newUser.Email)
+		invitation := inviter.GenerateInvitation(invited)
+		//new person is added
+		serv.repository.AddPerson(invited)
+		//then send email to the person
+		sendInvitation(*invitation, serv.sender)
+		return *invitation, nil
+	}
+	return Invitation{}, errors.New("The user has not enough permission to invite people")
 }
 
 func sendInvitation(invitation Invitation, sender Sender) {

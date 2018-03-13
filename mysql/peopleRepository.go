@@ -29,7 +29,7 @@ func NewPeopleRepository(connection Connection) invitations.Repository {
 }
 
 // GetAllPeople gets all people from db source
-func (pr PeopleRepository) GetAllPeople() ([]invitations.User, error) {
+func (pr PeopleRepository) GetAllPeople() ([]invitations.AppUser, error) {
 
 	db, err := openConnection(pr)
 	if err != nil {
@@ -37,38 +37,38 @@ func (pr PeopleRepository) GetAllPeople() ([]invitations.User, error) {
 	}
 	defer db.Close()
 
-	/* 	queryStmt, err := db.Prepare("SELECT * from USERS")
-	   	if err != nil {
-	   		return nil, fmt.Errorf("preparing query failed: %s", err.Error())
-	   	}
-	   	defer queryStmt.Close() */
-
 	rows, err := db.Query("SELECT * from USERS")
 	if err != nil {
 		return nil, fmt.Errorf("executing query failed: %s", err.Error())
 	}
 
-	users := make([]invitations.User, 0)
+	users := make([]invitations.AppUser, 0)
 
 	for rows.Next() {
 		var entryID int
 		var name string
 		var email string
 		var registered bool
-		err = rows.Scan(&entryID, &name, &email, &registered)
-		person := invitations.Person{
-			ID:    strconv.Itoa(entryID),
-			Email: email,
-			Name:  name,
+		var admin bool
+		err = rows.Scan(&entryID, &name, &email, &registered, &admin)
+
+		var appUser invitations.AppUser
+		if admin {
+			appUser = invitations.NewAdminUser(strconv.Itoa(entryID), name, email)
+		} else if registered {
+			appUser = invitations.NewRegisteredUser(strconv.Itoa(entryID), name, email)
+		} else {
+			appUser = invitations.NewInvitedUser(strconv.Itoa(entryID), name, email)
 		}
-		users = append(users, invitations.User{PersonBase: person, Registered: registered})
+
+		users = append(users, appUser)
 	}
 
 	return users, nil
 }
 
 //GetPersonByID gets the person with the specified id from the db source
-func (pr PeopleRepository) GetPersonByID(id string) (*invitations.User, error) {
+func (pr PeopleRepository) GetPersonByID(id string) (invitations.AppUser, error) {
 	db, err := openConnection(pr)
 	if err != nil {
 		return nil, err
@@ -79,34 +79,38 @@ func (pr PeopleRepository) GetPersonByID(id string) (*invitations.User, error) {
 	var name string
 	var email string
 	var registered bool
-	errScan := db.QueryRow("SELECT entryId, name, email, registered FROM users WHERE entryID = ?", id).Scan(&entryID, &name, &email, &registered)
+	var admin bool
+	errScan := db.QueryRow("SELECT entryId, name, email, registered, admin FROM users WHERE entryID = ?", id).Scan(&entryID, &name, &email, &registered, &admin)
+
 	if errScan != nil {
 		return nil, fmt.Errorf("Executing query failed: %s", errScan.Error())
 	}
 
-	person := invitations.Person{
-		ID:    strconv.Itoa(entryID),
-		Email: email,
-		Name:  name,
+	var appUser invitations.AppUser
+	if admin {
+		appUser = invitations.NewAdminUser(strconv.Itoa(entryID), name, email)
+	} else if registered {
+		appUser = invitations.NewRegisteredUser(strconv.Itoa(entryID), name, email)
+	} else {
+		appUser = invitations.NewInvitedUser(strconv.Itoa(entryID), name, email)
 	}
 
-	user := invitations.User{
-		PersonBase: person,
-		Registered: registered,
-	}
-
-	return &user, nil
+	return appUser, nil
 }
 
 //AddPerson adds a new person to the db source
-func (pr *PeopleRepository) AddPerson(p *invitations.Person) error {
+func (pr *PeopleRepository) AddPerson(p invitations.AppUser) error {
 	db, err := openConnection(*pr)
 	if err != nil {
 		return err
 	}
 	defer db.Close()
 
-	result, errExec := db.Exec("INSERT INTO users (name, email,registered) VALUES (?, ?, ?)", p.Name, p.Email, false)
+	result, errExec := db.Exec("INSERT INTO users (name, email,registered, admin) VALUES (?, ?, ?, ?)",
+		p.GetPersonInfo().Name,
+		p.GetPersonInfo().Email,
+		p.GetPersonInfo().Registered,
+		p.GetPersonInfo().Admin)
 
 	if errExec != nil {
 		return fmt.Errorf("Inserting person failed: %s", errExec.Error())

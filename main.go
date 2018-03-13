@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"feedwell/fake"
-	_ "feedwell/inmemorydb"
 	"feedwell/invitations"
 	"feedwell/mysql"
 	"log"
@@ -24,12 +23,12 @@ func GetAllUsers(w http.ResponseWriter, r *http.Request) {
 func InvitePerson(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]
-	var person invitations.Person
-	errDecode := json.NewDecoder(r.Body).Decode(&person)
+	var newUser invitations.NewUser
+	errDecode := json.NewDecoder(r.Body).Decode(&newUser)
 	if errDecode != nil {
 		json.NewEncoder(w).Encode(errDecode.Error())
 	} else {
-		inv, err := service.InvitePerson(id, person)
+		inv, err := service.InvitePerson(id, newUser)
 		if err != nil {
 			json.NewEncoder(w).Encode(err) //TODO: Change this to handle http Errors
 		} else {

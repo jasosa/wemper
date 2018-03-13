@@ -8,38 +8,30 @@ import (
 type RepoForTest struct{}
 
 //GetAllPeople ...
-func (r RepoForTest) GetAllPeople() ([]User, error) {
-	return []User{
-		User{
-			PersonBase: Person{Email: "myemail", Name: "nyname", ID: "1"},
-			Registered: true,
-		},
-		User{
-			PersonBase: Person{Email: "myemail2", Name: "nyname2", ID: "2"},
-			Registered: true,
-		},
+func (r RepoForTest) GetAllPeople() ([]AppUser, error) {
+
+	ru := NewRegisteredUser("1", "myname", "myemail")
+	ru2 := NewRegisteredUser("2", "myname2", "myemail2")
+
+	return []AppUser{
+		ru,
+		ru2,
 	}, nil
 }
 
 //GetPersonByID ...
-func (r RepoForTest) GetPersonByID(id string) (*User, error) {
+func (r RepoForTest) GetPersonByID(id string) (AppUser, error) {
 	if id == "nonExistentPersonID" {
 		return nil, errors.New("This error should be sent")
 	} else if id == "NonRegisteredPersonID" {
-		return &User{
-			PersonBase: Person{Email: "myemail", Name: "nyname", ID: "1"},
-			Registered: false,
-		}, nil
+		return NewInvitedUser("1", "invitedPersonName", "invitedPersonEmail"), nil
 	} else {
-		return &User{
-			PersonBase: Person{Email: "emailFromRegistered", Name: "NameFromRegistered", ID: "1"},
-			Registered: true,
-		}, nil
+		return NewAdminUser("1", "adminPersonName", "adminPersonEmail"), nil
 	}
 }
 
 //AddPerson ...
-func (r RepoForTest) AddPerson(p *Person) error {
+func (r RepoForTest) AddPerson(p AppUser) error {
 	return nil
 }
 
