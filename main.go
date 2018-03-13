@@ -25,12 +25,16 @@ func InvitePerson(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]
 	var person invitations.Person
-	_ = json.NewDecoder(r.Body).Decode(&person)
-	inv, err := service.InvitePerson(id, person)
-	if err != nil {
-		json.NewEncoder(w).Encode(err) //TODO: Change this to handle http Errors
+	errDecode := json.NewDecoder(r.Body).Decode(&person)
+	if errDecode != nil {
+		json.NewEncoder(w).Encode(errDecode.Error())
 	} else {
-		json.NewEncoder(w).Encode(inv)
+		inv, err := service.InvitePerson(id, person)
+		if err != nil {
+			json.NewEncoder(w).Encode(err) //TODO: Change this to handle http Errors
+		} else {
+			json.NewEncoder(w).Encode(inv)
+		}
 	}
 }
 
