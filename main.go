@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"feedwell/fake"
 	"feedwell/invitations"
 	"feedwell/mysql"
 	"log"
@@ -44,7 +43,7 @@ func init() {
 	// assigning all the repository interfaces
 	//repository = inmemorydb.NewPeopleRepository()
 	repository = mysql.NewPeopleRepository(new(mysql.DbConnection))
-	var sender = fake.NewInvitationSender()
+	var sender = invitations.NewFakeInvitationSender()
 	service = invitations.NewBasicService(repository, sender)
 }
 
