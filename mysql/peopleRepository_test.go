@@ -218,16 +218,6 @@ func prepareMockedRepository(t *testing.T) (*sql.DB, sqlmock.Sqlmock, invitation
 	return db, mock, peopleRepository
 }
 
-// MockDbConnection ...
-type MockDbConnection struct {
-	mockdb *sql.DB
-}
-
-//OpenConnection open an mock slq connection
-func (db *MockDbConnection) OpenConnection(stringConn string) (*sql.DB, error) {
-	return db.mockdb, db.mockdb.Ping()
-}
-
 func giveMeAPerson() invitations.AppUser {
 	person := invitations.NewInvitedUser("", "Peter", "Peter@cool.com")
 	return person

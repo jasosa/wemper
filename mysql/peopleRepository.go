@@ -9,9 +9,13 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
+//Connection ...
+type Connection interface {
+	OpenConnection(stringConn string) (*sql.DB, error)
+}
+
 //PeopleRepository mysql repository for people entities
 type PeopleRepository struct {
-	//TODO: use encrypted credentials instead user and password
 	connection   Connection
 	user         string
 	password     string

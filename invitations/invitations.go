@@ -15,8 +15,3 @@ func NewInvitation(fromID string, toID string, text string) *Invitation {
 	invitation.Text = text
 	return invitation
 }
-
-//Sender allows sending invitations
-type Sender interface {
-	Send(inv Invitation) error
-}
