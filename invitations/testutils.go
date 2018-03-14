@@ -32,6 +32,9 @@ func (r RepoForTest) GetPersonByID(id string) (AppUser, error) {
 
 //AddPerson ...
 func (r RepoForTest) AddPerson(p AppUser) error {
+	if p.GetPersonInfo().Name == "personThatWillFailWhenAdded" {
+		return errors.New("simulating error")
+	}
 	return nil
 }
 

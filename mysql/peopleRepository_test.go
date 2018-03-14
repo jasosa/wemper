@@ -5,6 +5,7 @@ import (
 	"errors"
 	"feedwell/invitations"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
+	"reflect"
 	"strings"
 	"testing"
 )
@@ -14,16 +15,15 @@ func TestGetAllUsersShouldReturnAllUsersInDb(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Error opening stub db connection: %s ", err.Error())
 	}
-
 	defer db.Close()
 
 	//Creating repo with mock database
 	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
 
 	//Setting expectations
-	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered"}).
-		AddRow(1, "pepito", "pepito@email.com", true).
-		AddRow(2, "jaimito", "jaimito@email.com", false)
+	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
+		AddRow(1, "pepito", "pepito@email.com", true, true).
+		AddRow(2, "jaimito", "jaimito@email.com", false, true)
 
 	mock.ExpectQuery("^SELECT (.+) from USERS$").WillReturnRows(rows)
 
@@ -34,9 +34,9 @@ func TestGetAllUsersShouldReturnAllUsersInDb(t *testing.T) {
 
 	// Asserting
 	if errQuery != nil {
-		t.Errorf("Error: %s", errQuery)
+		t.Errorf("Error getting users from db: %s", errQuery)
 	} else if len(users) != expectedUsers {
-		t.Errorf("Number of returned users is different than expected. Expected: %d / Returned: %d", expectedUsers, len(users))
+		t.Errorf("Error getting users from db: Number of returned users is different than expected. Expected: %d / Returned: %d", expectedUsers, len(users))
 	}
 }
 
@@ -121,12 +121,18 @@ func TestWhenThereisAnErrorPreparingTheQueryAnErrorShouldBeReturned(t *testing.T
 	_, errRep := peopleRepository.GetAllPeople()
 
 	//Asserting
-	if errRep == nil {
-		t.Fatalf("Not error returned")
+
+	if errRep != nil {
+		switch et := errRep.(type) {
+		case *SQLQueryError:
+			// do nothing
+		default:
+			t.Errorf("Wrong error returned. Expected error of type {\"%s\"} but returned {\"%s\"}", "*SQLQueryError", reflect.TypeOf(et))
+		}
+	} else {
+		t.Errorf("No error returned. Expected error of type {\"%s\"}", "*SQLQueryError")
 	}
-	if !strings.Contains(errRep.Error(), expectedError) {
-		t.Fatalf("Wrong error returned: %s", errRep.Error())
-	}
+
 }
 
 func TestWhenRequstingByIdAPersonShouldBeReturned(t *testing.T) {

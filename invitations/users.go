@@ -2,6 +2,7 @@ package invitations
 
 import (
 	"fmt"
+	"strings"
 )
 
 //AppUser is an interface to handle all the users in the app
@@ -23,6 +24,14 @@ type Person struct {
 	Email      string `json:"email,omitempty"`
 	Registered bool   `json:"registered,omitempty"`
 	Admin      bool   `json:"admin,omitempty"`
+}
+
+//HasValidNameAndEmail retruns true if name and email are valids
+func (p Person) HasValidNameAndEmail() bool {
+	//TODO: Change validations
+	trimmedName := strings.TrimSpace(p.Name)
+	trimmedEmail := strings.TrimSpace(p.Email)
+	return len(trimmedName) > 0 && len(trimmedEmail) > 0
 }
 
 //NewUser represents information of someone that is not already in the system

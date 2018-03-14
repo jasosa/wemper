@@ -2,6 +2,7 @@ package mysql
 
 import (
 	"database/sql"
+	"errors"
 	"feedwell/invitations"
 	"fmt"
 	"strconv"
@@ -41,31 +42,22 @@ func (pr PeopleRepository) GetAllPeople() ([]invitations.AppUser, error) {
 	}
 	defer db.Close()
 
-	rows, err := db.Query("SELECT * from USERS")
+	var query = "SELECT * from USERS"
+	rows, err := db.Query(query)
 	if err != nil {
-		return nil, fmt.Errorf("executing query failed: %s", err.Error())
+		return nil, &SQLQueryError{Query: query, BaseError: err}
 	}
 
 	users := make([]invitations.AppUser, 0)
-
 	for rows.Next() {
 		var entryID int
-		var name string
-		var email string
-		var registered bool
-		var admin bool
+		var name, email string
+		var registered, admin bool
 		err = rows.Scan(&entryID, &name, &email, &registered, &admin)
-
-		var appUser invitations.AppUser
-		if admin {
-			appUser = invitations.NewAdminUser(strconv.Itoa(entryID), name, email)
-		} else if registered {
-			appUser = invitations.NewRegisteredUser(strconv.Itoa(entryID), name, email)
-		} else {
-			appUser = invitations.NewInvitedUser(strconv.Itoa(entryID), name, email)
+		if err != nil {
+			return nil, &SQLQueryError{Query: query, BaseError: err}
 		}
-
-		users = append(users, appUser)
+		users = append(users, pr.createUser(entryID, name, email, registered, admin))
 	}
 
 	return users, nil
@@ -84,21 +76,14 @@ func (pr PeopleRepository) GetPersonByID(id string) (invitations.AppUser, error)
 	var email string
 	var registered bool
 	var admin bool
-	errScan := db.QueryRow("SELECT entryId, name, email, registered, admin FROM users WHERE entryID = ?", id).Scan(&entryID, &name, &email, &registered, &admin)
+	var query = "SELECT entryId, name, email, registered, admin FROM users WHERE entryID = ?"
+	errScan := db.QueryRow(query, id).Scan(&entryID, &name, &email, &registered, &admin)
 
 	if errScan != nil {
-		return nil, fmt.Errorf("Executing query failed: %s", errScan.Error())
+		return nil, &SQLQueryError{Query: query, BaseError: errScan}
 	}
 
-	var appUser invitations.AppUser
-	if admin {
-		appUser = invitations.NewAdminUser(strconv.Itoa(entryID), name, email)
-	} else if registered {
-		appUser = invitations.NewRegisteredUser(strconv.Itoa(entryID), name, email)
-	} else {
-		appUser = invitations.NewInvitedUser(strconv.Itoa(entryID), name, email)
-	}
-
+	appUser := pr.createUser(entryID, name, email, registered, admin)
 	return appUser, nil
 }
 
@@ -110,40 +95,51 @@ func (pr *PeopleRepository) AddPerson(p invitations.AppUser) error {
 	}
 	defer db.Close()
 
-	result, errExec := db.Exec("INSERT INTO users (name, email,registered, admin) VALUES (?, ?, ?, ?)",
+	var query = "INSERT INTO users (name, email,registered, admin) VALUES (?, ?, ?, ?)"
+	result, errExec := db.Exec(query,
 		p.GetPersonInfo().Name,
 		p.GetPersonInfo().Email,
 		p.GetPersonInfo().Registered,
 		p.GetPersonInfo().Admin)
 
 	if errExec != nil {
-		return fmt.Errorf("Inserting person failed: %s", errExec.Error())
+		return &SQLQueryError{Query: query, BaseError: errExec}
 	}
 
 	rowsAffected, errorRowsAff := result.RowsAffected()
-
 	if errorRowsAff != nil {
-		return fmt.Errorf("Inserting person failed: %s", errorRowsAff.Error())
+		return &SQLQueryError{Query: query, BaseError: errorRowsAff}
 	}
 
 	if rowsAffected != 1 {
-		return fmt.Errorf("Inserting person failed: Rows affected (%d)", rowsAffected)
+		return &SQLQueryError{Query: query, BaseError: errors.New("1 row affected was expected, but %s rows were affected")}
 	}
 
 	_, errorRLI := result.LastInsertId()
-
 	if errorRLI != nil {
-		return fmt.Errorf("Inserting person failed: %s", errorRLI.Error())
+		return &SQLQueryError{Query: query, BaseError: errorRLI}
 	}
 
 	return nil
+}
+
+func (pr PeopleRepository) createUser(entryID int, name, email string, registered, admin bool) invitations.AppUser {
+	var appUser invitations.AppUser
+	if admin {
+		appUser = invitations.NewAdminUser(strconv.Itoa(entryID), name, email)
+	} else if registered {
+		appUser = invitations.NewRegisteredUser(strconv.Itoa(entryID), name, email)
+	} else {
+		appUser = invitations.NewInvitedUser(strconv.Itoa(entryID), name, email)
+	}
+	return appUser
 }
 
 func openConnection(pr PeopleRepository) (*sql.DB, error) {
 	stringCon := fmt.Sprintf("%s:%s@/%s", pr.user, pr.password, pr.databasename)
 	db, err := pr.connection.OpenConnection(stringCon)
 	if err != nil {
-		return nil, fmt.Errorf("mySQLConnection failed: %s", err.Error())
+		return nil, &SQLOpeningDBError{BaseError: err}
 	}
 	return db, nil
 }

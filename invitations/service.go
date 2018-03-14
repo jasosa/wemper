@@ -1,7 +1,6 @@
 package invitations
 
 import (
-	"errors"
 	"fmt"
 )
 
@@ -32,24 +31,32 @@ func (serv basicService) GetAllUsers(GetFromAnySource func() ([]AppUser, error))
 
 //InvitePerson ... returns the generated invitation text
 func (serv basicService) InvitePerson(inviterID string, newUser NewUser) (Invitation, error) {
-	//get inviter
-	inviterUser, err := serv.repository.GetPersonByID(inviterID)
 
+	inviterUser, err := serv.repository.GetPersonByID(inviterID)
 	if err != nil {
-		return Invitation{}, fmt.Errorf("Error getting information from datasource: %s", err.Error())
+		return Invitation{}, &UserNotFoundError{UserID: inviterID, BaseError: err}
 	}
+
 	inviter, ok := inviterUser.(Inviter)
 	if ok {
 		//creates a new invitedUser based on newUser info
 		invited := NewInvitedUser("", newUser.Name, newUser.Email)
+		if !invited.GetPersonInfo().HasValidNameAndEmail() {
+			return Invitation{}, &UserNotValidError{
+				BaseError: fmt.Errorf("Provided user info is not valid. \"Name\":{\"%s\"} \"Email\":{\"%s\"}", newUser.Name, newUser.Email),
+			}
+		}
+
 		invitation := inviter.GenerateInvitation(invited)
-		//new person is added
-		serv.repository.AddPerson(invited)
+		err = serv.repository.AddPerson(invited)
+		if err != nil {
+			return Invitation{}, &UserCouldNotBeAddedError{BaseError: err}
+		}
 		//then send email to the person
 		sendInvitation(*invitation, serv.sender)
 		return *invitation, nil
 	}
-	return Invitation{}, errors.New("The user has not enough permission to invite people")
+	return Invitation{}, &ActionNotAllowedToUserError{UserID: inviterID, Action: "Invite"}
 }
 
 func sendInvitation(invitation Invitation, sender Sender) {

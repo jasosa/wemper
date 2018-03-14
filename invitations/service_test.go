@@ -1,6 +1,7 @@
 package invitations
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -18,8 +19,52 @@ func TestWhenInvitationSentByNonExistentInviterShouldReturnError(t *testing.T) {
 	s := NewBasicService(testRepo, nil)
 
 	_, err := s.InvitePerson("nonExistentPersonID", NewUser{Name: "myname", Email: "myemail"})
+
 	if err == nil {
-		t.Error("An error should be returned when an invitation arrives from a non-existend ID")
+		t.Errorf("No error returned. Expected error of type {\"%s\"}", "*UserNotFoundError")
+	} else {
+		switch et := err.(type) {
+		case *UserNotFoundError:
+			//ok
+		default:
+			t.Errorf("Wrong error returned: Expected error of type {\"%s\"} but returned {\"%s\"}", "*UserNotFoundError", reflect.TypeOf(et))
+		}
+	}
+}
+
+func TestWhenNotValidUserNameOrEmailSentShouldReturnError(t *testing.T) {
+	testRepo := new(RepoForTest)
+	s := NewBasicService(testRepo, nil)
+
+	_, err := s.InvitePerson("ARegisteredPersonID", NewUser{Name: "", Email: ""})
+
+	if err == nil {
+		t.Errorf("No error returned. Expected error of type {\"%s\"}", "*UserNotValidError")
+	} else {
+		switch et := err.(type) {
+		case *UserNotValidError:
+			//ok
+		default:
+			t.Errorf("Wrong error returned: Expected error of type {\"%s\"} but returned {\"%s\"}", "*UserNotValidError", reflect.TypeOf(et))
+		}
+	}
+}
+
+func TestWhenInvitingPersonCanNotBeAddedToTheServiceShouldReturnError(t *testing.T) {
+	testRepo := new(RepoForTest)
+	s := NewBasicService(testRepo, nil)
+
+	_, err := s.InvitePerson("ARegisteredPersonID", NewUser{Name: "personThatWillFailWhenAdded", Email: "myemail"})
+
+	if err == nil {
+		t.Errorf("No error returned. Expected error of type {\"%s\"}", "*UserCouldNotBeAddedError")
+	} else {
+		switch et := err.(type) {
+		case *UserCouldNotBeAddedError:
+			//ok
+		default:
+			t.Errorf("Wrong error returned: Expected error of type {\"%s\"} but returned {\"%s\"}", "*UserCouldNotBeAddedError", reflect.TypeOf(et))
+		}
 	}
 }
 
@@ -27,8 +72,16 @@ func TestWhenInvitationCannotbeSentShouldReturnError(t *testing.T) {
 	testRepo := new(RepoForTest)
 	s := NewBasicService(testRepo, nil)
 	_, err := s.InvitePerson("NonRegisteredPersonID", NewUser{Name: "myname", Email: "myemail"})
-	if err.Error() != "The user has not enough permission to invite people" {
-		t.Error("An error should be returned when a non-registered user tries to generates an invitation")
+
+	if err == nil {
+		t.Errorf("No error returned. Expected error of type {\"%s\"}", "*ActionNotAllowedToUserError")
+	} else {
+		switch et := err.(type) {
+		case *ActionNotAllowedToUserError:
+			//ok
+		default:
+			t.Errorf("Wrong error returned: Expected error of type {\"%s\"} but returned {\"%s\"}", "*ActionNotAllowedToUserError", reflect.TypeOf(et))
+		}
 	}
 }
 
