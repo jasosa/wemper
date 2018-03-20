@@ -1,21 +1,15 @@
 package main
 
 import (
+	"github.com/gorilla/mux"
 	"github.com/jasosa/wemper/pkg/service"
-)
-
-import (
 	"log"
+	"net/http"
 )
 
 func main() {
-	/* router := mux.NewRouter()
-	router.Handle("/persons", service.AppHandler(service.GetAllUsers)).Methods("GET")
-	router.Handle("/persons/{id}/invitations/", service.AppHandler(service.InvitePerson)).Methods("POST")
-	log.Fatal(http.ListenAndServe(":8080", router)) */
-
-	api := service.NewAPI()
-	api.AddEndpoint("/persons", "GET", service.APIErrorHandler(service.GetAllUsers))
-	api.AddEndpoint("/persons/{id}/invitations/", "POST", service.APIErrorHandler(service.InvitePerson))
-	log.Fatal(service.Serve(api, ":8080"))
+	router := mux.NewRouter()
+	router.Handle("/persons", service.APIErrorMiddleware(service.GetAllUsersHandler)).Methods("GET")
+	router.Handle("/persons/{id}/invitations/", service.APIErrorMiddleware(service.InvitePersonHandler)).Methods("POST")
+	log.Fatal(http.ListenAndServe(":8080", router))
 }
