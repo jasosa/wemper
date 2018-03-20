@@ -2,9 +2,9 @@ package server
 
 import (
 	"encoding/json"
-	"feedwell/invitations"
-	"feedwell/mysql"
 	"github.com/gorilla/mux"
+	"github.com/jasosa/wemper/invitations"
+	"github.com/jasosa/wemper/mysql"
 	"net/http"
 )
 

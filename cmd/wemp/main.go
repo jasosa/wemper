@@ -1,7 +1,7 @@
 package main
 
 import (
-	"feedwell/server"
+	"github.com/jasosa/wemper/server"
 )
 
 import (

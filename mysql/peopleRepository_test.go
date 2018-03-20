@@ -3,7 +3,7 @@ package mysql
 import (
 	"database/sql"
 	"errors"
-	"feedwell/invitations"
+	"github.com/jasosa/wemper/invitations"
 	"gopkg.in/DATA-DOG/go-sqlmock.v1"
 	"reflect"
 	"strings"

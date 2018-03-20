@@ -1,8 +1,8 @@
 package server
 
 import (
-	"feedwell/invitations"
-	"feedwell/mysql"
+	"github.com/jasosa/wemper/invitations"
+	"github.com/jasosa/wemper/mysql"
 )
 
 //HTTPError represents an error sent to the client

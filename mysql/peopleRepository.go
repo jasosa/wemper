@@ -3,11 +3,11 @@ package mysql
 import (
 	"database/sql"
 	"errors"
-	"feedwell/invitations"
 	"fmt"
-	"strconv"
-	//we will use it
+	//needed for initialization
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jasosa/wemper/invitations"
+	"strconv"
 )
 
 //Connection ...
