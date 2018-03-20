@@ -17,8 +17,8 @@ func TestGetAllUsersShouldReturnAllUsersInDb(t *testing.T) {
 	}
 	defer db.Close()
 
-	//Creating repo with mock database
-	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
+	//Creating source with mock database
+	peopleSource := NewPeopleSource(gettingMockConnection(db))
 
 	//Setting expectations
 	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
@@ -30,7 +30,7 @@ func TestGetAllUsersShouldReturnAllUsersInDb(t *testing.T) {
 	expectedUsers := 2
 
 	//Acting
-	users, errQuery := peopleRepository.GetAllPeople()
+	users, errQuery := peopleSource.GetAllPeople()
 
 	// Asserting
 	if errQuery != nil {
@@ -48,7 +48,7 @@ func TestWhenUserIsAdminAnAdminUserIsReturned(t *testing.T) {
 
 	defer db.Close()
 	//Creating repo with mock database
-	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
+	peoplSource := NewPeopleSource(gettingMockConnection(db))
 
 	//Setting expectations
 	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
@@ -57,7 +57,7 @@ func TestWhenUserIsAdminAnAdminUserIsReturned(t *testing.T) {
 	mock.ExpectQuery("^SELECT (.+) from USERS$").WillReturnRows(rows)
 
 	//Acting
-	users, errQuery := peopleRepository.GetAllPeople()
+	users, errQuery := peoplSource.GetAllPeople()
 
 	// Asserting
 	if errQuery != nil {
@@ -79,7 +79,7 @@ func TestWhenUserIsRegisteredARegisteredUserIsReturned(t *testing.T) {
 
 	defer db.Close()
 	//Creating repo with mock database
-	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
+	peopleSource := NewPeopleSource(gettingMockConnection(db))
 
 	//Setting expectations
 	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
@@ -88,7 +88,7 @@ func TestWhenUserIsRegisteredARegisteredUserIsReturned(t *testing.T) {
 	mock.ExpectQuery("^SELECT (.+) from USERS$").WillReturnRows(rows)
 
 	//Acting
-	users, errQuery := peopleRepository.GetAllPeople()
+	users, errQuery := peopleSource.GetAllPeople()
 
 	// Asserting
 	if errQuery != nil {
@@ -111,14 +111,14 @@ func TestWhenThereisAnErrorPreparingTheQueryAnErrorShouldBeReturned(t *testing.T
 	defer db.Close()
 
 	//Creating repo with mock database
-	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
+	peopleSource := NewPeopleSource(gettingMockConnection(db))
 
 	//setting expectations
 	expectedError := "an expected error"
 	mock.ExpectQuery("^SELECT (.+) from USERS$").WillReturnError(errors.New(expectedError))
 
 	//Acting
-	_, errRep := peopleRepository.GetAllPeople()
+	_, errRep := peopleSource.GetAllPeople()
 
 	//Asserting
 
@@ -143,7 +143,7 @@ func TestWhenRequstingByIdAPersonShouldBeReturned(t *testing.T) {
 	defer db.Close()
 
 	//Creating repo with mock database
-	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
+	peopleSource := NewPeopleSource(gettingMockConnection(db))
 
 	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
 		AddRow(1, "pepito", "pepito@email.com", true, false)
@@ -151,7 +151,7 @@ func TestWhenRequstingByIdAPersonShouldBeReturned(t *testing.T) {
 	mock.ExpectQuery("^SELECT (.+) FROM users WHERE (.+)$").WithArgs("1").WillReturnRows(rows)
 
 	//Acting
-	user, errRep := peopleRepository.GetPersonByID("1")
+	user, errRep := peopleSource.GetPersonByID("1")
 
 	// Asserting
 	if errRep != nil {
@@ -169,13 +169,13 @@ func TestWhenRequestingByNonExistentIdAnErrorShouldBeReturned(t *testing.T) {
 	defer db.Close()
 
 	//Creating repo with mock database
-	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
+	peopleSource := NewPeopleSource(gettingMockConnection(db))
 
 	expectedError := "An expected error"
 	mock.ExpectQuery("^SELECT (.+) FROM users WHERE (.+)$").WithArgs("1").WillReturnError(errors.New(expectedError))
 
 	//Acting
-	_, errRep := peopleRepository.GetPersonByID("1")
+	_, errRep := peopleSource.GetPersonByID("1")
 
 	// Asserting
 	if errRep == nil {
@@ -188,14 +188,14 @@ func TestWhenRequestingByNonExistentIdAnErrorShouldBeReturned(t *testing.T) {
 
 func TestWhenAPersonIsAddedThePersonIsRegisteredInTheDB(t *testing.T) {
 
-	db, mock, peopleRepository := prepareMockedRepository(t)
+	db, mock, peopleSource := prepareMockedSource(t)
 	defer db.Close()
 
 	//setting expectations
 	mock.ExpectExec("INSERT INTO users").WithArgs("Peter", "Peter@cool.com", false, false).WillReturnResult(sqlmock.NewResult(1, 1))
 
 	//acting
-	errRep := peopleRepository.AddPerson(giveMeAPerson())
+	errRep := peopleSource.AddPerson(giveMeAPerson())
 
 	//asserting
 	errExpec := mock.ExpectationsWereMet()
@@ -215,13 +215,13 @@ func gettingMockConnection(db *sql.DB) Connection {
 	return con
 }
 
-func prepareMockedRepository(t *testing.T) (*sql.DB, sqlmock.Sqlmock, invitations.Repository) {
+func prepareMockedSource(t *testing.T) (*sql.DB, sqlmock.Sqlmock, invitations.Source) {
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("Error opening stub db connection: %s ", err.Error())
 	}
-	peopleRepository := NewPeopleRepository(gettingMockConnection(db))
-	return db, mock, peopleRepository
+	peopleSource := NewPeopleSource(gettingMockConnection(db))
+	return db, mock, peopleSource
 }
 
 func giveMeAPerson() invitations.AppUser {

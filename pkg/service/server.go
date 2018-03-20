@@ -1,4 +1,4 @@
-package server
+package service
 
 import (
 	"encoding/json"
@@ -8,20 +8,20 @@ import (
 	"net/http"
 )
 
-var repository invitations.Repository
+var repository invitations.Source
 var service invitations.Service
 
 func init() {
 	// assigning all the repository interfaces
-	repository = mysql.NewPeopleRepository(new(mysql.DbConnection))
+	repository = mysql.NewPeopleSource(new(mysql.DbConnection))
 	var sender = invitations.NewFakeInvitationSender()
 	service = invitations.NewBasicService(repository, sender)
 }
 
-//AppHandler ...
-type AppHandler func(http.ResponseWriter, *http.Request) error
+//APIErrorHandler ...
+type APIErrorHandler func(http.ResponseWriter, *http.Request) error
 
-func (fn AppHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (fn APIErrorHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if err := fn(w, r); err != nil {
 		httperror := getHTTPError(err)
 		http.Error(w, httperror.ErrorMessage, httperror.HTTPStatusCode)

@@ -15,17 +15,17 @@ type Connection interface {
 	OpenConnection(stringConn string) (*sql.DB, error)
 }
 
-//PeopleRepository mysql repository for people entities
-type PeopleRepository struct {
+//PeopleSource mysql source for people entities
+type PeopleSource struct {
 	connection   Connection
 	user         string
 	password     string
 	databasename string
 }
 
-//NewPeopleRepository creates a new instance of mysql people repository
-func NewPeopleRepository(connection Connection) invitations.Repository {
-	pr := new(PeopleRepository)
+//NewPeopleSource creates a new instance of mysql people source
+func NewPeopleSource(connection Connection) invitations.Source {
+	pr := new(PeopleSource)
 	pr.user = "wempathy"
 	pr.password = "wempathy2018"
 	pr.databasename = "wempathy"
@@ -34,7 +34,7 @@ func NewPeopleRepository(connection Connection) invitations.Repository {
 }
 
 // GetAllPeople gets all people from db source
-func (pr PeopleRepository) GetAllPeople() ([]invitations.AppUser, error) {
+func (pr PeopleSource) GetAllPeople() ([]invitations.AppUser, error) {
 
 	db, err := openConnection(pr)
 	if err != nil {
@@ -64,7 +64,7 @@ func (pr PeopleRepository) GetAllPeople() ([]invitations.AppUser, error) {
 }
 
 //GetPersonByID gets the person with the specified id from the db source
-func (pr PeopleRepository) GetPersonByID(id string) (invitations.AppUser, error) {
+func (pr PeopleSource) GetPersonByID(id string) (invitations.AppUser, error) {
 	db, err := openConnection(pr)
 	if err != nil {
 		return nil, err
@@ -88,7 +88,7 @@ func (pr PeopleRepository) GetPersonByID(id string) (invitations.AppUser, error)
 }
 
 //AddPerson adds a new person to the db source
-func (pr *PeopleRepository) AddPerson(p invitations.AppUser) error {
+func (pr *PeopleSource) AddPerson(p invitations.AppUser) error {
 	db, err := openConnection(*pr)
 	if err != nil {
 		return err
@@ -123,7 +123,7 @@ func (pr *PeopleRepository) AddPerson(p invitations.AppUser) error {
 	return nil
 }
 
-func (pr PeopleRepository) createUser(entryID int, name, email string, registered, admin bool) invitations.AppUser {
+func (pr PeopleSource) createUser(entryID int, name, email string, registered, admin bool) invitations.AppUser {
 	var appUser invitations.AppUser
 	if admin {
 		appUser = invitations.NewAdminUser(strconv.Itoa(entryID), name, email)
@@ -135,7 +135,7 @@ func (pr PeopleRepository) createUser(entryID int, name, email string, registere
 	return appUser
 }
 
-func openConnection(pr PeopleRepository) (*sql.DB, error) {
+func openConnection(pr PeopleSource) (*sql.DB, error) {
 	stringCon := fmt.Sprintf("%s:%s@/%s", pr.user, pr.password, pr.databasename)
 	db, err := pr.connection.OpenConnection(stringCon)
 	if err != nil {

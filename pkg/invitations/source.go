@@ -1,7 +1,7 @@
 package invitations
 
-//Repository for people
-type Repository interface {
+//Source for people
+type Source interface {
 	GetAllPeople() ([]AppUser, error)
 	GetPersonByID(id string) (AppUser, error)
 	AddPerson(p AppUser) error

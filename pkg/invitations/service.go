@@ -13,12 +13,12 @@ type Service interface {
 
 //basicService implements Service
 type basicService struct {
-	repository Repository
+	repository Source
 	sender     Sender
 }
 
 //NewBasicService creates a new instance of people.Service
-func NewBasicService(repository Repository, sender Sender) Service {
+func NewBasicService(repository Source, sender Sender) Service {
 	service := new(basicService)
 	service.repository = repository
 	service.sender = sender
