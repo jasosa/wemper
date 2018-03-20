@@ -1,8 +1,8 @@
 package invitations_test
 
 import (
-	"github.com/jasosa/wemper/invitations"
-	"github.com/jasosa/wemper/mock"
+	"github.com/jasosa/wemper/pkg/invitations"
+	"github.com/jasosa/wemper/pkg/invitations/mock"
 	"reflect"
 	"testing"
 )

@@ -1,8 +1,8 @@
 package server
 
 import (
-	"github.com/jasosa/wemper/invitations"
-	"github.com/jasosa/wemper/mysql"
+	"github.com/jasosa/wemper/pkg/invitations"
+	"github.com/jasosa/wemper/pkg/invitations/mysql"
 )
 
 //HTTPError represents an error sent to the client

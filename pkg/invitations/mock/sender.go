@@ -1,7 +1,7 @@
 package mock
 
 import (
-	"github.com/jasosa/wemper/invitations"
+	"github.com/jasosa/wemper/pkg/invitations"
 )
 
 //Sender mock

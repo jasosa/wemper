@@ -1,7 +1,7 @@
 package invitations_test
 
 import (
-	"github.com/jasosa/wemper/invitations"
+	"github.com/jasosa/wemper/pkg/invitations"
 	"testing"
 )
 

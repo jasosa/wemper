@@ -6,7 +6,7 @@ import (
 	"fmt"
 	//needed for initialization
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/jasosa/wemper/invitations"
+	"github.com/jasosa/wemper/pkg/invitations"
 	"strconv"
 )
 

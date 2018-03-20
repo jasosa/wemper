@@ -2,7 +2,7 @@ package mock
 
 import (
 	"errors"
-	"github.com/jasosa/wemper/invitations"
+	"github.com/jasosa/wemper/pkg/invitations"
 )
 
 //Source mock source

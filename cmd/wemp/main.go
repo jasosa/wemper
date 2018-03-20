@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/jasosa/wemper/server"
+	"github.com/jasosa/wemper/pkg/server"
 )
 
 import (

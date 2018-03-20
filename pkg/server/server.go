@@ -3,8 +3,8 @@ package server
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
-	"github.com/jasosa/wemper/invitations"
-	"github.com/jasosa/wemper/mysql"
+	"github.com/jasosa/wemper/pkg/invitations"
+	"github.com/jasosa/wemper/pkg/invitations/mysql"
 	"net/http"
 )
 
