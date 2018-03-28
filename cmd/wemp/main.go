@@ -9,10 +9,12 @@ import (
 
 func main() {
 	router := mux.NewRouter()
+	getAllUsersHandlerWithHTTPError := service.HTTPErrorMiddleware(service.GetAllUsersHandler)
+	invitePersonsHandlerWithHTTPError := service.HTTPErrorMiddleware(service.InvitePersonHandler)
 
-	handler := service.APIErrorMiddleware(service.GetAllUsersHandler)
-	loggedHandler := service.LoggingMiddleware(handler)
-	router.Handle("/persons", loggedHandler).Methods("GET")
-	router.Handle("/persons/{id}/invitations/", service.APIErrorMiddleware(service.InvitePersonHandler)).Methods("POST")
+	router.Handle("/persons",
+		service.LoggingMiddleware(getAllUsersHandlerWithHTTPError)).Methods("GET")
+	router.Handle("/persons/{id}/invitations/",
+		service.LoggingMiddleware(invitePersonsHandlerWithHTTPError)).Methods("POST")
 	log.Fatal(http.ListenAndServe(":8080", router))
 }
