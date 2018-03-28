@@ -5,7 +5,7 @@ import (
 	"github.com/jasosa/wemper/pkg/invitations/mysql"
 )
 
-//ClientAPIError represents an error sent to the client
+//ClientAPIError represents an error sent to the API client
 type ClientAPIError struct {
 	HTTPStatusCode int
 	ErrorMessage   string

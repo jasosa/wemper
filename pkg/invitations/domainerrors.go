@@ -14,7 +14,7 @@ func (e *UserNotFoundError) Error() string {
 	if e == nil {
 		return ""
 	}
-	errorString := fmt.Sprintf("User not found. \"UserID\":{\"%s\"} \"Errors\":{\"%s\"}", e.UserID, e.BaseError.Error())
+	errorString := fmt.Sprintf("User not found. \"UserID\":{\"%s\"} \"Base Errors\":{\"%s\"}", e.UserID, e.BaseError.Error())
 	return errorString
 }
 
@@ -41,7 +41,7 @@ func (e *UserCouldNotBeAddedError) Error() string {
 	if e == nil {
 		return ""
 	}
-	errorString := fmt.Sprintf("User was not added to the system. \"Errors\":{\"%s\"}", e.BaseError.Error())
+	errorString := fmt.Sprintf("User was not added to the system. \"Base Errors\":{\"%s\"}", e.BaseError.Error())
 	return errorString
 }
 
@@ -54,6 +54,6 @@ func (e *UserNotValidError) Error() string {
 	if e == nil {
 		return ""
 	}
-	errorString := fmt.Sprintf("User not valid. \"Errors\":{\"%s\"}", e.BaseError.Error())
+	errorString := fmt.Sprintf("User not valid. \"Base Errors\":{\"%s\"}", e.BaseError.Error())
 	return errorString
 }

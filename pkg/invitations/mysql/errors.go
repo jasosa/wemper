@@ -14,7 +14,7 @@ func (e *SQLQueryError) Error() string {
 	if e == nil {
 		return ""
 	}
-	errorString := fmt.Sprintf("SQL query failed. \"Query\":{\"%s\"}, \"Errors\":{\"%s\"}", e.Query, e.BaseError.Error())
+	errorString := fmt.Sprintf("SQL query failed. \"Query\":{\"%s\"}, \"Base Errors\":{\"%s\"}", e.Query, e.BaseError.Error())
 	return errorString
 }
 
@@ -27,6 +27,6 @@ func (e *SQLOpeningDBError) Error() string {
 	if e == nil {
 		return ""
 	}
-	errorString := fmt.Sprintf("Open db failed. \"Errors\":{\"%s\"}", e.BaseError.Error())
+	errorString := fmt.Sprintf("Open db failed. \"Base Errors\":{\"%s\"}", e.BaseError.Error())
 	return errorString
 }
