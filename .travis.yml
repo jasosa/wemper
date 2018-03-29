@@ -12,6 +12,6 @@ go:
 install:
   - go get -t ./...
   
- script:
+script:
  - go vet ./... 
 
