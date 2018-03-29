@@ -14,6 +14,8 @@ install:
   
 script:
  - go vet ./... 
- - go test -v ./... -cover -coverprofile=c.out
- - go tool cover -html=c.out -o coverage.html
+ - go test -v ./... -cover -coverprofile=coverage.txt -covermode=atomic
+ 
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
 
