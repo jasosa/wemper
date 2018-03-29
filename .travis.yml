@@ -14,5 +14,6 @@ install:
   
 script:
  - go vet ./... 
- - go test -v ./... -cover
+ - go test -v ./... -cover -coverprofile=c.out
+ - go tool cover -html=cover.out -o coverage.html
 
