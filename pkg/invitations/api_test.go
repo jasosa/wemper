@@ -11,7 +11,7 @@ func TestWhenGetAllUsersThenRepositoryGetsTheUsers(t *testing.T) {
 	testRepo := new(mock.Source)
 	s := invitations.NewAPI(testRepo, nil)
 	users, _ := s.GetAllUsers(testRepo.GetAllPeople)
-	if len(users) != 3 {
+	if len(users) != 2 {
 		t.Errorf("Retrieving users from source was not successful. %d were returned instead of %d", len(users), 2)
 	}
 }
