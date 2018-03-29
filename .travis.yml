@@ -9,8 +9,9 @@ language: go
 go:
   - "1.10"
 
-# Skip the install step. Don't `go get` dependencies. Only build with the
-# code in vendor/
 install:
   - go get -t ./...
+  
+ script:
+ - go vet ./... 
 
