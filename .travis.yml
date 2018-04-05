@@ -1,28 +1,17 @@
 language: go
-
-# Only the last two Go releases are supported by the Go team with security
-# updates. Any versions older than that should be considered deprecated.
-# Don't bother testing with them. tip builds your code with the latest
-# development version of Go. This can warn you that your code will break
-# in the next version of Go. Don't worry! Later we declare that test runs
-# are allowed to fail on Go tip.
 go:
-  - "1.10"
-
+- '1.10'
 install:
-  - go get -t ./...
-
+- go get -t ./...
 script:
-  - go vet ./... 
-  - go test -v ./... -cover -coverprofile=coverage.txt -covermode=atomic
-
+- go vet ./...
+- go test -v ./... -cover -coverprofile=coverage.txt -covermode=atomic
 after_success:
-  - bash <(curl -s https://codecov.io/bash)
-
+- bash <(curl -s https://codecov.io/bash)
 deploy:
   provider: heroku
   api_key:
-    secure: "uwQBm38m/SUQTVO0dvacQXAZS53WdzxC3xDQyPxmEPqN0oWNJ6lEUd6nrd6RIEteM1XkfMpl8WpcgoPytUZxEeB+n108y9NIbZ5UJBwDk+JrrjgqZl8GjmiMkOqtLNfwUuCUBpE7SHDGn+gHrYYhq8O9hcukJ2TkAcns9vnMhkA1y16I5NgyrWhXGRYSlznMOpESrd+Ei5ztjBf0QJwpNlo6dam4d84/1a43e9VLWKusZwgIpjt8eBWe9TbLW5akmdxa8WD+HjUaaCZOtjgg+HiV0BuCPRVs+L1mL3zin5DrBUAaq5X92lsthtU3+a0uLYft6MullWOwJ+zmMc6cUxJ3e9Bw9D9rM4JKWLZlaUWlt3BE/zUJitY2Cn20jdag+JWxya0hpFZfI34ldR4kp/nDYR8serpdkwZdvX25eEcvWA+GFqdszF8z4se2D7D2Dbx02eL7sIbnJYLf8vTUmqrlqbWNv5QU79LdPPf7tLZr9tPErqId7x0SzZ2Gp0iD5Kg/NXbtroJGAduBimg3Jx4mvqx3mWtGFr98dHOrLAIMwkxblKmDDhW7xX4M/NvxQzrwew9ladvm1PiixDF0yNFJ32JjeKsQ3VVcN9KORjgEyQI9nIGygCyDpYYhQq/t5twkLQ0pZaDnHArM7Huynm/7xYfZLn4xPruXG3J71kE="
+    secure: TrIq1kWBdhlg5TQ1MUGrxchkWFMyCSxfULrMonCVEM0Lxv1xuyPzVd9ZMpsKcdPYCtXCI3tKlBJ6AXBt6UDNYdNQp4SSW2NC77mcrcw6vv4/sdPmyVZhtAv7lHFhtkxuWw8yyPsT57Uy+Q/rFxnkryNSoGGUa0sQFuoa+KA4t8lmqosJ7xVL/nQlNPh5QeB6DgrOU0Kh+sgIRwY5TAIETGxw1IzmKPHuaI5V73kEpCCohjhdGektSD+g/0luBQvF02QnklFri71BkUO1nhPpRNdPJb/2dU25HoS8JJ73xyC6ph3ylgq9dKyAetUmZ1CixcyHSVSCGOHXYmUuxQfPSBWjPIAbLBAg7lRXgWPJf8RXe67h0UIU4lo0FU/RkX6BGhtkE8+gm0FcXVt2DV4NKAJGnYEeXUuBWH2bh5UC5yhXRzx0CElSZ94OPra/iPxDoXXtsYi3Vihd3Nk8psIVmATHfXVF9Hnk+VqEO1cyxnLQkVPlizzrImZHN8/GZ5u6XnTtuWqokx7ZiyFxuYduKkDqzVVtm2wma5qkOpKYQYbMf9zMNk9QgR+QJZOKTw2lSGLngtd4BGV0WRi46pTIcCDyEop1+UvNWk2wg248SOfX+HDpl6WE7QKjyD7Gzh7AhrYzA1IuPc4Z83mewJiY32IQG/P+Lwui2L1kkkJBhRQ=
   app: wemper
   on:
     repo: jasosa/wemper
