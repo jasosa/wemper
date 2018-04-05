@@ -18,4 +18,11 @@ script:
  
 after_success:
   - bash <(curl -s https://codecov.io/bash)
-
+  
+deploy:
+  provider: heroku
+  api_key:
+    secure: 05431c6d-2ca7-4f9d-9cf8-6e2bc75c9f24
+  app: wemper
+  on:
+    repo: jasosa/wemper
