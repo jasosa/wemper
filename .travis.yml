@@ -9,20 +9,22 @@ language: go
 go:
   - "1.10"
 
-install:
-  - go get -t ./...
-  
-script:
- - go vet ./... 
- - go test -v ./... -cover -coverprofile=coverage.txt -covermode=atomic
- 
-after_success:
-  - bash <(curl -s https://codecov.io/bash)
-  
-deploy:
-  provider: heroku
-  api_key:
-    secure: 05431c6d-2ca7-4f9d-9cf8-6e2bc75c9f24
-  app: wemper
-  on:
-    repo: jasosa/wemper
+jobs:
+  include:
+  - stage: install
+  install:
+    - go get -t ./...
+  - stage: unit tests
+  script:
+    - go vet ./... 
+    - go test -v ./... -cover -coverprofile=coverage.txt -covermode=atomic
+  after_success:
+    - bash <(curl -s https://codecov.io/bash)
+  - stage: deploy
+  deploy:
+    provider: heroku
+    api_key:
+      secure: 05431c6d-2ca7-4f9d-9cf8-6e2bc75c9f24
+    app: wemper
+    on:
+      repo: jasosa/wemper
