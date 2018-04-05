@@ -11,10 +11,9 @@ go:
 
 jobs:
   include:
-  - stage: install
+  - stage: unit tests
   install:
     - go get -t ./...
-  - stage: unit tests
   script:
     - go vet ./... 
     - go test -v ./... -cover -coverprofile=coverage.txt -covermode=atomic
