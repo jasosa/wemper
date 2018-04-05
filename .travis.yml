@@ -22,7 +22,7 @@ after_success:
 deploy:
   provider: heroku
   api_key:
-    secure: 05431c6d-2ca7-4f9d-9cf8-6e2bc75c9f24
+    secure: "uwQBm38m/SUQTVO0dvacQXAZS53WdzxC3xDQyPxmEPqN0oWNJ6lEUd6nrd6RIEteM1XkfMpl8WpcgoPytUZxEeB+n108y9NIbZ5UJBwDk+JrrjgqZl8GjmiMkOqtLNfwUuCUBpE7SHDGn+gHrYYhq8O9hcukJ2TkAcns9vnMhkA1y16I5NgyrWhXGRYSlznMOpESrd+Ei5ztjBf0QJwpNlo6dam4d84/1a43e9VLWKusZwgIpjt8eBWe9TbLW5akmdxa8WD+HjUaaCZOtjgg+HiV0BuCPRVs+L1mL3zin5DrBUAaq5X92lsthtU3+a0uLYft6MullWOwJ+zmMc6cUxJ3e9Bw9D9rM4JKWLZlaUWlt3BE/zUJitY2Cn20jdag+JWxya0hpFZfI34ldR4kp/nDYR8serpdkwZdvX25eEcvWA+GFqdszF8z4se2D7D2Dbx02eL7sIbnJYLf8vTUmqrlqbWNv5QU79LdPPf7tLZr9tPErqId7x0SzZ2Gp0iD5Kg/NXbtroJGAduBimg3Jx4mvqx3mWtGFr98dHOrLAIMwkxblKmDDhW7xX4M/NvxQzrwew9ladvm1PiixDF0yNFJ32JjeKsQ3VVcN9KORjgEyQI9nIGygCyDpYYhQq/t5twkLQ0pZaDnHArM7Huynm/7xYfZLn4xPruXG3J71kE="
   app: wemper
   on:
     repo: jasosa/wemper
