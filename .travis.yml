@@ -24,3 +24,5 @@ deploy:
   api_key:
     secure: 05431c6d-2ca7-4f9d-9cf8-6e2bc75c9f24
   app: wemper
+  on:
+    repo: jasosa/wemper
