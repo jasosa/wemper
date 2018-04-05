@@ -34,10 +34,10 @@ func (svc *Service) Server(port string) *http.Server {
 	router := mux.NewRouter()
 
 	getAllUsersHandler := ErrorHandler{HandleWithErrorFunc(svc.getAllUsersHandler), svc.logger}
-	router.Handle("api/persons", LoggingMiddleware(svc.logger, getAllUsersHandler)).Methods("GET")
+	router.Handle("/api/persons", LoggingMiddleware(svc.logger, getAllUsersHandler)).Methods("GET")
 
 	invitePersonsHandler := ErrorHandler{HandleWithErrorFunc(svc.invitePersonHandler), svc.logger}
-	router.Handle("api/persons/{id}/invitations/", LoggingMiddleware(svc.logger, invitePersonsHandler)).Methods("POST")
+	router.Handle("/api/persons/{id}/invitations/", LoggingMiddleware(svc.logger, invitePersonsHandler)).Methods("POST")
 
 	return &http.Server{Addr: port, Handler: router}
 }
