@@ -21,14 +21,16 @@ type PeopleSource struct {
 	user         string
 	password     string
 	databasename string
+	databasehost string
 }
 
 //NewPeopleSource creates a new instance of mysql people source
-func NewPeopleSource(connection Connection) invitations.Source {
+func NewPeopleSource(connection Connection, user, password, databasename, databasehost string) invitations.Source {
 	pr := new(PeopleSource)
-	pr.user = "wempathy"
-	pr.password = "wempathy2018"
-	pr.databasename = "wempathy"
+	pr.user = user
+	pr.password = password
+	pr.databasename = databasename
+	pr.databasehost = databasehost
 	pr.connection = connection
 	return pr
 }
@@ -136,7 +138,7 @@ func (pr PeopleSource) createUser(entryID int, name, email string, registered, a
 }
 
 func openConnection(pr PeopleSource) (*sql.DB, error) {
-	stringCon := fmt.Sprintf("%s:%s@/%s", pr.user, pr.password, pr.databasename)
+	stringCon := fmt.Sprintf("%s:%s@%s/%s", pr.user, pr.password, pr.databasehost, pr.databasename)
 	db, err := pr.connection.OpenConnection(stringCon)
 	if err != nil {
 		return nil, &SQLOpeningDBError{BaseError: err}

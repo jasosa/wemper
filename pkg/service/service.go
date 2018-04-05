@@ -24,7 +24,7 @@ func New(conf Config) *Service {
 		logger: conf.Logger,
 	}
 	svc.invitationsSender = invitations.NewFakeInvitationSender()
-	svc.invitationsSource = mysql.NewPeopleSource(new(mysql.DbConnection))
+	svc.invitationsSource = mysql.NewPeopleSource(new(mysql.DbConnection), conf.DBUser, conf.DBPwd, conf.DBName, conf.DBHost)
 	svc.invitationsAPI = invitations.NewAPI(svc.invitationsSource, svc.invitationsSender)
 	return &svc
 }

@@ -23,6 +23,10 @@ func main() {
 
 	conf := service.Config{
 		Logger: logger,
+		DBName: getEnv("DBNAME", "wempathy"),
+		DBUser: getEnv("DBUSER", "wempathy"),
+		DBPwd:  getEnv("DBPWD", "wempathy2018"),
+		DBHost: getEnv("DBHOST", "tcp(localhost:3306)"),
 	}
 
 	//configuring server
@@ -59,4 +63,11 @@ func getAddress() string {
 		addr = ":8080"
 	}
 	return addr
+}
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }

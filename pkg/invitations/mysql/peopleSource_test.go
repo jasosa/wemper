@@ -18,7 +18,7 @@ func TestGetAllUsersShouldReturnAllUsersInDb(t *testing.T) {
 	defer db.Close()
 
 	//Creating source with mock database
-	peopleSource := NewPeopleSource(gettingMockConnection(db))
+	peopleSource := NewPeopleSource(gettingMockConnection(db), "", "", "", "")
 
 	//Setting expectations
 	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
@@ -48,7 +48,7 @@ func TestWhenUserIsAdminAnAdminUserIsReturned(t *testing.T) {
 
 	defer db.Close()
 	//Creating repo with mock database
-	peoplSource := NewPeopleSource(gettingMockConnection(db))
+	peoplSource := NewPeopleSource(gettingMockConnection(db), "", "", "", "")
 
 	//Setting expectations
 	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
@@ -79,7 +79,7 @@ func TestWhenUserIsRegisteredARegisteredUserIsReturned(t *testing.T) {
 
 	defer db.Close()
 	//Creating repo with mock database
-	peopleSource := NewPeopleSource(gettingMockConnection(db))
+	peopleSource := NewPeopleSource(gettingMockConnection(db), "", "", "", "")
 
 	//Setting expectations
 	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
@@ -111,7 +111,7 @@ func TestWhenThereisAnErrorPreparingTheQueryAnErrorShouldBeReturned(t *testing.T
 	defer db.Close()
 
 	//Creating repo with mock database
-	peopleSource := NewPeopleSource(gettingMockConnection(db))
+	peopleSource := NewPeopleSource(gettingMockConnection(db), "", "", "", "")
 
 	//setting expectations
 	expectedError := "an expected error"
@@ -143,7 +143,7 @@ func TestWhenRequstingByIdAPersonShouldBeReturned(t *testing.T) {
 	defer db.Close()
 
 	//Creating repo with mock database
-	peopleSource := NewPeopleSource(gettingMockConnection(db))
+	peopleSource := NewPeopleSource(gettingMockConnection(db), "", "", "", "")
 
 	rows := sqlmock.NewRows([]string{"entryID", "name", "email", "registered", "admin"}).
 		AddRow(1, "pepito", "pepito@email.com", true, false)
@@ -169,7 +169,7 @@ func TestWhenRequestingByNonExistentIdAnErrorShouldBeReturned(t *testing.T) {
 	defer db.Close()
 
 	//Creating repo with mock database
-	peopleSource := NewPeopleSource(gettingMockConnection(db))
+	peopleSource := NewPeopleSource(gettingMockConnection(db), "", "", "", "")
 
 	expectedError := "An expected error"
 	mock.ExpectQuery("^SELECT (.+) FROM users WHERE (.+)$").WithArgs("1").WillReturnError(errors.New(expectedError))
@@ -220,7 +220,7 @@ func prepareMockedSource(t *testing.T) (*sql.DB, sqlmock.Sqlmock, invitations.So
 	if err != nil {
 		t.Fatalf("Error opening stub db connection: %s ", err.Error())
 	}
-	peopleSource := NewPeopleSource(gettingMockConnection(db))
+	peopleSource := NewPeopleSource(gettingMockConnection(db), "", "", "", "")
 	return db, mock, peopleSource
 }
 
