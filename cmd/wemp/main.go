@@ -21,6 +21,11 @@ func main() {
 	logger.Out = os.Stdout
 	logger.Level = log.DebugLevel
 
+	/* os.Setenv("DBNAME", "heroku_1d8a7d4ba22cc5b")
+	os.Setenv("DBUSER", "b9d871228888d0")
+	os.Setenv("DBPWD", "90afc3a2")
+	os.Setenv("DBHOST", "tcp(us-cdbr-iron-east-05.cleardb.net:3306)") */
+
 	conf := service.Config{
 		Logger: logger,
 		DBName: getEnv("DBNAME", "wempathy"),

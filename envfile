@@ -1,0 +1,2 @@
+
+DBHOST=tcp(host.docker.internal:3306)
